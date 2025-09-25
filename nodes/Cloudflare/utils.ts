@@ -1,5 +1,4 @@
 import type { IExecuteFunctions, ILoadOptionsFunctions } from 'n8n-workflow';
-import { sleep } from './utils_sleep';
 import { IHttpRequestMethods } from 'n8n-workflow/dist/esm/interfaces';
 
 type Ctx = IExecuteFunctions | ILoadOptionsFunctions;
@@ -9,6 +8,13 @@ export interface RequestOptions {
 	url: string;
 	qs?: Record<string, any>;
 	body?: any;
+}
+
+
+export function sleep(ms: number): Promise<void> {
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});
 }
 
 export async function requestWithRetry(
