@@ -11,7 +11,7 @@ import {
 } from 'n8n-workflow';
 import { collectAllPaginated, requestWithRetry } from './utils';
 
-type CloudflareResource = 'zone' | 'dnsRecord' | 'firewallRule' | 'cache';
+type CloudflareResource = 'zone' | 'dnsRecord' | 'cache';
 type Operation = 'list' | 'get' | 'create' | 'update' | 'delete' | 'purge';
 
 export class Cloudflare implements INodeType {
@@ -52,7 +52,6 @@ export class Cloudflare implements INodeType {
 				options: [
 					{ name: 'Zone', value: 'zone' },
 					{ name: 'DNS Record', value: 'dnsRecord' },
-					{ name: 'Firewall Rule', value: 'firewallRule' },
 					{ name: 'Cache', value: 'cache' },
 				],
 				default: 'zone',
@@ -132,8 +131,8 @@ export class Cloudflare implements INodeType {
 
 				displayOptions: {
 					show: {
-						resource: ['zone'],
-						operation: ['get', 'update', 'delete'],
+						resource: ['zone', "cache"],
+						operation: ['get', 'update', 'delete', 'purge'],
 					},
 				},
 			},
