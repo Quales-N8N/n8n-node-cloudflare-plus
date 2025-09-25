@@ -1,0 +1,22 @@
+{
+  "name": "Cloudflare Worker Route Deploy",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "workers",
+        "operation": "deploy",
+        "accountId": "={{$json.accountId}}",
+        "routePattern": "example.com/*",
+        "scriptName": "my-worker"
+      },
+      "name": "Deploy Worker Route",
+      "type": "n8n-nodes-cloudflare.cloudflare",
+      "typeVersion": 1,
+      "position": [260, 300],
+      "credentials": {"cloudflareApi": {"id": "<cred-id>", "name": "Cloudflare API"}}
+    }
+  ],
+  "connections": {}
+}
+
+

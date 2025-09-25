@@ -1,0 +1,36 @@
+{
+  "name": "Cloudflare DNS CRUD",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "dnsRecord",
+        "operation": "create",
+        "zoneId": "={{$json.zoneId}}",
+        "type": "A",
+        "name": "example",
+        "content": "203.0.113.1",
+        "ttl": 120
+      },
+      "name": "Cloudflare",
+      "type": "n8n-nodes-cloudflare.cloudflare",
+      "typeVersion": 1,
+      "position": [260, 300],
+      "credentials": {"cloudflareApi": {"id": "<cred-id>", "name": "Cloudflare API"}}
+    },
+    {
+      "parameters": {
+        "resource": "dnsRecord",
+        "operation": "list",
+        "zoneId": "={{$json.zoneId}}",
+        "returnAll": true
+      },
+      "name": "List Records",
+      "type": "n8n-nodes-cloudflare.cloudflare",
+      "typeVersion": 1,
+      "position": [540, 300]
+    }
+  ],
+  "connections": {}
+}
+
+

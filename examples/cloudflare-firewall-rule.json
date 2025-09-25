@@ -1,0 +1,20 @@
+{
+  "name": "Cloudflare Firewall Rule Create",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "firewallRule",
+        "operation": "create",
+        "zoneId": "={{$json.zoneId}}"
+      },
+      "name": "Create Firewall Rule",
+      "type": "n8n-nodes-cloudflare.cloudflare",
+      "typeVersion": 1,
+      "position": [260, 300],
+      "credentials": {"cloudflareApi": {"id": "<cred-id>", "name": "Cloudflare API"}}
+    }
+  ],
+  "connections": {}
+}
+
+

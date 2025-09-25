@@ -1,0 +1,20 @@
+{
+  "name": "Cloudflare Cache Purge",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "cache",
+        "operation": "purge",
+        "zoneId": "={{$json.zoneId}}"
+      },
+      "name": "Purge Cache",
+      "type": "n8n-nodes-cloudflare.cloudflare",
+      "typeVersion": 1,
+      "position": [260, 300],
+      "credentials": {"cloudflareApi": {"id": "<cred-id>", "name": "Cloudflare API"}}
+    }
+  ],
+  "connections": {}
+}
+
+

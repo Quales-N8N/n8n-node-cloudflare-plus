@@ -1,19 +1,19 @@
 {
-  "name": "n8n-nodes-<...>",
+  "name": "n8n-nodes-cloudflare-plus",
   "version": "0.1.0",
-  "description": "",
+  "description": "An n8n community node for managing Cloudflare resources (Zones, DNS records, Firewall rules, Cache, Workers, Analytics).",
   "keywords": [
     "n8n-community-node-package"
   ],
   "license": "MIT",
   "homepage": "",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "Quales",
+    "email": "contact-n8n@quales.me"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/<...>/n8n-nodes-<...>.git"
+    "url": "https://github.com/Quales-N8N/n8n-node-cloudflare-plus.git"
   },
   "engines": {
     "node": ">=20.15"
@@ -25,6 +25,7 @@
     "format": "prettier nodes credentials --write",
     "lint": "eslint nodes credentials package.json",
     "lintfix": "eslint nodes credentials package.json --fix",
+    "test": "vitest run",
     "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
   },
   "files": [
@@ -33,12 +34,10 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/ExampleCredentialsApi.credentials.js",
-      "dist/credentials/HttpBinApi.credentials.js"
+      "dist/credentials/CloudflareApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/ExampleNode/ExampleNode.node.js",
-      "dist/nodes/HttpBin/HttpBin.node.js"
+      "dist/nodes/Cloudflare/Cloudflare.node.js"
     ]
   },
   "devDependencies": {
@@ -47,9 +46,14 @@
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
     "gulp": "^5.0.0",
     "prettier": "^3.5.3",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^2.0.5",
+    "ts-node": "^10.9.2"
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "vitest": {
+    "testTimeout": 20000
   }
 }
