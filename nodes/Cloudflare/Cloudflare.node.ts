@@ -117,9 +117,7 @@ export class Cloudflare implements INodeType {
 						resource: ['cache'],
 					},
 				},
-				options: [
-					{ name: 'Purge', value: 'purge', description: 'Purge cache' },
-				],
+				options: [{ name: 'Purge', value: 'purge', description: 'Purge cache' }],
 				default: 'purge',
 			},
 
@@ -135,24 +133,22 @@ export class Cloudflare implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['zone'],
-						operation: ['get', 'create', 'update', 'delete'],
+						operation: ['get', 'update', 'delete'],
 					},
 				},
 			},
 
 			{
-				displayName: 'Zone Name or ID',
-				name: 'zoneId',
-				type: 'options',
+				displayName: 'Zone Name',
+				name: 'zoneName',
+				type: 'string',
 				description:
-					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-				typeOptions: { loadOptionsMethod: 'getZones' },
+					'Enter the name of the zone to create, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 				default: '',
-
 				displayOptions: {
 					show: {
-						resource: ['dnsRecord', 'firewallRule', 'cache'],
-						operation: ['list', 'get', 'update', 'delete'],
+						resource: ['zone'],
+						operation: ['create'],
 					},
 				},
 			},
@@ -175,7 +171,35 @@ export class Cloudflare implements INodeType {
 				},
 			},
 
-			// Create/Update DNS record fields
+			// Create/Update
+			{
+				displayName: 'Zone Type',
+				name: 'zoneType',
+				type: 'options',
+				options: [{ name: 'Full', value: 'full' }],
+				default: 'full',
+				displayOptions: {
+					show: {
+						resource: ['zone'],
+						operation: ['create'],
+					},
+				},
+			},
+			{
+				displayName: 'Account Name or ID',
+				name: 'accountId',
+				type: 'options',
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+				typeOptions: { loadOptionsMethod: 'getAccounts' },
+				default: '',
+				displayOptions: {
+					show: {
+						resource: ['zone'],
+						operation: ['create'],
+					},
+				},
+			},
 			{
 				displayName: 'Record Type',
 				name: 'type',
@@ -370,6 +394,18 @@ export class Cloudflare implements INodeType {
 						responseData = await requestWithRetry(this, {
 							method: 'DELETE',
 							url: `/zones/${zoneId}`,
+						});
+					} else if (operation === 'create') {
+						const body = {
+							account: {
+								id: this.getNodeParameter('accountId', i),
+							},
+							name: this.getNodeParameter('zoneName', i),
+						};
+						responseData = await requestWithRetry(this, {
+							method: 'POST',
+							url: `/zones`,
+							body,
 						});
 					}
 				}
