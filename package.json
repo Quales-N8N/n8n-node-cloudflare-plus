@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-cloudflare-plus",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An n8n community node for managing Cloudflare resources (Zones, DNS records, Firewall rules, Cache, Workers, Analytics).",
   "keywords": [
     "n8n-community-node-package"
