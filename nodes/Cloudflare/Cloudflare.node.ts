@@ -1,4 +1,4 @@
-/* eslint-disable n8n-nodes-base/node-param-operation-option-without-action,n8n-nodes-base/node-param-options-type-unsorted-items */
+/* eslint-disable n8n-nodes-base/node-param-operation-option-without-action,n8n-nodes-base/node-param-options-type-unsorted-items,n8n-nodes-base/node-param-display-name-wrong-for-dynamic-options */
 import {
 	IExecuteFunctions,
 	ILoadOptionsFunctions,
@@ -122,7 +122,7 @@ export class Cloudflare implements INodeType {
 			},
 
 			{
-				displayName: 'Zone Name or ID',
+				displayName: 'Zone ID',
 				name: 'zoneId',
 				type: 'options',
 				description:
@@ -134,6 +134,23 @@ export class Cloudflare implements INodeType {
 					show: {
 						resource: ['zone'],
 						operation: ['get', 'update', 'delete'],
+					},
+				},
+			},
+
+			{
+				displayName: 'Zone ID',
+				name: 'zoneId',
+				type: 'options',
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+				typeOptions: { loadOptionsMethod: 'getZones' },
+				default: '',
+
+				displayOptions: {
+					show: {
+						resource: ['dnsRecord'],
+						operation: ['list', 'create', 'get', 'update', 'delete'],
 					},
 				},
 			},
@@ -155,7 +172,7 @@ export class Cloudflare implements INodeType {
 
 			// DNS record specific
 			{
-				displayName: 'DNS Record Name or ID',
+				displayName: 'DNS Record ID',
 				name: 'dnsRecordId',
 				type: 'options',
 				description:
@@ -186,7 +203,7 @@ export class Cloudflare implements INodeType {
 				},
 			},
 			{
-				displayName: 'Account Name or ID',
+				displayName: 'Account ID',
 				name: 'accountId',
 				type: 'options',
 				description:
@@ -437,7 +454,7 @@ export class Cloudflare implements INodeType {
 							name: this.getNodeParameter('name', i),
 							content: this.getNodeParameter('content', i),
 							ttl: this.getNodeParameter('ttl', i),
-						} as Record<string, unknown>;
+						}
 						const res = await requestWithRetry(this, {
 							method: 'POST',
 							url: `/zones/${zoneId}/dns_records`,
@@ -488,6 +505,7 @@ export class Cloudflare implements INodeType {
 					json: Array.isArray(responseData) ? { data: responseData } : responseData,
 				});
 			} catch (error: any) {
+				console.log(error);
 				if (this.continueOnFail()) {
 					returnData.push({
 						json: { error: error.message, details: error.description || error },

@@ -13,7 +13,6 @@ export interface RequestOptions {
 export async function requestWithRetry(
 	ctx: Ctx,
 	opts: RequestOptions,
-	maxRetries = 5,
 ): Promise<any> {
 	try {
 		// Build headers explicitly from credentials to avoid undefined header injection
