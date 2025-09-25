@@ -11,8 +11,8 @@ import {
 } from 'n8n-workflow';
 import { collectAllPaginated, requestWithRetry } from './utils';
 
-type CloudflareResource = 'zone' | 'dnsRecord' | 'cache';
-type Operation = 'list' | 'get' | 'create' | 'update' | 'delete' | 'purge';
+type CloudflareResource = 'zone' | 'dnsRecord';
+type Operation = 'list' | 'get' | 'create' | 'update' | 'delete';
 
 export class Cloudflare implements INodeType {
 	description: INodeTypeDescription = {
@@ -52,7 +52,6 @@ export class Cloudflare implements INodeType {
 				options: [
 					{ name: 'Zone', value: 'zone' },
 					{ name: 'DNS Record', value: 'dnsRecord' },
-					{ name: 'Cache', value: 'cache' },
 				],
 				default: 'zone',
 			},
@@ -103,23 +102,6 @@ export class Cloudflare implements INodeType {
 				default: 'list',
 			},
 
-			// --------------------
-			// Cache operations
-			// --------------------
-			{
-				displayName: 'Operation',
-				name: 'operation',
-				type: 'options',
-				noDataExpression: true,
-				displayOptions: {
-					show: {
-						resource: ['cache'],
-					},
-				},
-				options: [{ name: 'Purge', value: 'purge', description: 'Purge cache' }],
-				default: 'purge',
-			},
-
 			{
 				displayName: 'Zone ID',
 				name: 'zoneId',
@@ -131,8 +113,8 @@ export class Cloudflare implements INodeType {
 
 				displayOptions: {
 					show: {
-						resource: ['zone', "cache"],
-						operation: ['get', 'update', 'delete', 'purge'],
+						resource: ['zone'],
+						operation: ['get', 'update', 'delete'],
 					},
 				},
 			},
@@ -488,16 +470,6 @@ export class Cloudflare implements INodeType {
 							url: `/zones/${zoneId}/dns_records/${dnsRecordId}`,
 						});
 					}
-				}
-
-				if (resource === 'cache' && operation === 'purge') {
-					const zoneId = this.getNodeParameter('zoneId', i) as string;
-					const res = await requestWithRetry(this, {
-						method: 'POST',
-						url: `/zones/${zoneId}/purge_cache`,
-						body: { purge_everything: true },
-					});
-					responseData = res;
 				}
 
 				returnData.push({
