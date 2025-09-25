@@ -1,85 +1,69 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
-
 # n8n-node-cloudflare-plus
 
-Cloudflare declarative node for n8n with credentials, grouped resource/operation parameters, dynamic loaders, pagination, and robust retry handling.
+This is an n8n community node. It lets you use Cloudflare in your n8n workflows.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+Cloudflare is a global connectivity cloud providing CDN, DNS, security, serverless compute (Workers), and analytics for internet properties.
 
-If you would like your node to be available on n8n cloud you can also [submit your node for verification](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/).
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-## Prerequisites
+[Installation](#installation)  
+[Operations](#operations)  
+[Credentials](#credentials)  
+[Compatibility](#compatibility)  
+[Usage](#usage)  
+[Resources](#resources)  
+[Version history](#version-history)
 
-You need the following installed on your development machine:
+## Installation
 
-* [git](https://git-scm.com/downloads)
-* Node.js and npm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-## Using this package
+## Operations
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+Supported resources and operations:
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm run lint` to check for errors or `npm run lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. This README documents the Cloudflare node.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+- Zone: `list`, `get`, `delete`
+- DNS Record: `list`, `get`, `create`, `update`, `delete`
+- Firewall Rule: `list`, `create`, `delete`
+- Cache: `purge` (purge everything)
+- Workers: `deploy` (route pattern to script)
+- Analytics: `stats` (zone dashboard summary)
 
-## Cloudflare Node
+Dynamic option loaders help you select Accounts, Zones, and DNS Records.
 
-- Resources: `zone`, `dnsRecord`, `firewallRule`, `cache`, `workers`, `analytics`.
-- Operations: `list`, `get`, `create`, `update`, `delete`, plus `purge` (cache), `deploy` (workers), `stats` (analytics).
-- Credentials: API Token (recommended) or legacy API Key + Email.
-- Dynamic option loaders: Accounts, Zones, DNS Records.
-- Pagination: `returnAll` and `limit` with automatic page traversal.
-- Rate limits: Exponential backoff and `Retry-After` honored for 429/503.
-- Errors: Include Cloudflare error objects in messages.
+## Credentials
 
-### Credentials
+Create credentials of type `Cloudflare API`.
 
-Create credentials of type `Cloudflare API`. Choose `API Token` (recommended) and paste your token, or use `API Key + Email` if needed. Base URL defaults to `https://api.cloudflare.com/client/v4`.
+- Recommended: API Token (scoped to required resources) — sent as `Authorization: Bearer <token>`
+- Legacy: API Key + Email — sent as `X-Auth-Key` and `X-Auth-Email`
 
-### Examples
+The node defaults to `https://api.cloudflare.com/client/v4`. A built-in credential test verifies tokens at `/user/tokens/verify`.
 
-See `examples/` for ready-to-import workflows:
-- DNS: create/list/update/delete
-- Cache: purge everything for a zone
-- Firewall: create rule
-- Workers: deploy route to a script
+## Compatibility
 
-### OpenAPI-based regeneration
+- Works with current n8n 1.x releases.
+- Uses standard REST requests and should be OS/architecture agnostic. Please open an issue if you hit a version incompatibility.
 
-If you wish to extend operations using Cloudflare’s OpenAPI:
-- Download the OpenAPI spec from Cloudflare’s docs.
-- Use your preferred generator to produce operation shapes, then add mappings in `nodes/Cloudflare/Cloudflare.node.ts`.
+## Usage
 
-### Testing
+- Use the Resource and Operation selectors to choose what to perform.
+- For list operations, use `Return All` or `Limit`; pagination is handled automatically.
+- Respecting Cloudflare rate limits: requests honor `Retry-After` and use backoff on 429/503.
+- Examples are provided in `examples/` for DNS, cache purge, firewall rule creation, and worker route deployment.
 
-Run unit tests:
-```
-npm run test
-```
+## Support / Contact
 
-Tests cover pagination collection and error formatting/backoff utilities.
+- 💬 Open an [issue on GitHub](https://github.com/Quales-N8N/n8n-node-cloudflare-plus/issues)
+- 💬 Discord : @pepito9159
+- 📧 Mail: contact-n8n@quales.me
+- 🧑‍💻 Author: [Quales](https://github.com/Quales)
 
-## More information
+## Resources
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+* [Cloudflare API documentation](https://developers.cloudflare.com/api/)
 
-## License
+## Version history
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+- v1.0.0: Initial release with Zone, DNS, Firewall, Cache purge, Workers deploy, and Analytics stats.

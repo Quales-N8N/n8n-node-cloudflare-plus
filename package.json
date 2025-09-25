@@ -9,7 +9,8 @@
   "homepage": "",
   "author": {
     "name": "Quales",
-    "email": "contact-n8n@quales.me"
+    "email": "contact-n8n@quales.me",
+    "url": "https://quales.me"
   },
   "repository": {
     "type": "git",
