@@ -1,5 +1,5 @@
 import type { IExecuteFunctions, ILoadOptionsFunctions } from 'n8n-workflow';
-import { sleep } from './utils_sleep';
+import { setTimeout as sleep } from 'timers/promises';
 import { IHttpRequestMethods } from 'n8n-workflow/dist/esm/interfaces';
 
 type Ctx = IExecuteFunctions | ILoadOptionsFunctions;
