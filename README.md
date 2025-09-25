@@ -1,4 +1,4 @@
-# n8n-node-cloudflare-plus
+# n8n-nodes-cloudflare-plus
 
 This is an n8n community node. It lets you use Cloudflare in your n8n workflows.
 
@@ -54,7 +54,7 @@ The node defaults to `https://api.cloudflare.com/client/v4`. A built-in credenti
 
 ## Support / Contact
 
-- 💬 Open an [issue on GitHub](https://github.com/Quales-N8N/n8n-node-cloudflare-plus/issues)
+- 💬 Open an [issue on GitHub](https://github.com/Quales-N8N/n8n-nodes-cloudflare-plus/issues)
 - 💬 Discord : @pepito9159
 - 📧 Mail: contact-n8n@quales.me
 - 🧑‍💻 Author: [Quales](https://github.com/Quales)

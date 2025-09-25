@@ -11,8 +11,8 @@ import {
 } from 'n8n-workflow';
 import { collectAllPaginated, requestWithRetry } from './utils';
 
-type CloudflareResource = 'zone' | 'dnsRecord' | 'firewallRule' | 'cache' | 'workers' | 'analytics';
-type Operation = 'list' | 'get' | 'create' | 'update' | 'delete' | 'purge' | 'deploy' | 'stats';
+type CloudflareResource = 'zone' | 'dnsRecord' | 'firewallRule' | 'cache';
+type Operation = 'list' | 'get' | 'create' | 'update' | 'delete' | 'purge';
 
 export class Cloudflare implements INodeType {
 	description: INodeTypeDescription = {
@@ -54,54 +54,75 @@ export class Cloudflare implements INodeType {
 					{ name: 'DNS Record', value: 'dnsRecord' },
 					{ name: 'Firewall Rule', value: 'firewallRule' },
 					{ name: 'Cache', value: 'cache' },
-					{ name: 'Worker', value: 'workers' },
-					{ name: 'Analytics', value: 'analytics' },
 				],
 				default: 'zone',
 			},
 
+			// --------------------
+			// Zone operations
+			// --------------------
 			{
 				displayName: 'Operation',
 				name: 'operation',
 				type: 'options',
 				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: ['zone'],
+					},
+				},
 				options: [
-					{ name: 'List', value: 'list', description: 'List items' },
-					{ name: 'Get', value: 'get', description: 'Get one item' },
-					{ name: 'Create', value: 'create', description: 'Create item' },
-					{ name: 'Update', value: 'update', description: 'Update item' },
-					{ name: 'Delete', value: 'delete', description: 'Delete item' },
-					{ name: 'Purge', value: 'purge', description: 'Purge cache (cache resource)' },
-					{
-						name: 'Deploy',
-						value: 'deploy',
-						description: 'Deploy worker route (workers resource)',
-					},
-					{
-						name: 'Stats',
-						value: 'stats',
-						description: 'Get analytics stats (analytics resource)',
-					},
+					{ name: 'List', value: 'list', description: 'List zones' },
+					{ name: 'Get', value: 'get', description: 'Get zone details' },
+					{ name: 'Create', value: 'create', description: 'Create a zone' },
+					{ name: 'Update', value: 'update', description: 'Update a zone' },
+					{ name: 'Delete', value: 'delete', description: 'Delete a zone' },
 				],
 				default: 'list',
 			},
 
-			// Common: Account and Zone selectors (dynamic)
+			// --------------------
+			// DNS Record operations
+			// --------------------
 			{
-				displayName: 'Account Name or ID',
-				name: 'accountId',
+				displayName: 'Operation',
+				name: 'operation',
 				type: 'options',
-				description:
-					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-				typeOptions: { loadOptionsMethod: 'getAccounts' },
-				default: '',
-
+				noDataExpression: true,
 				displayOptions: {
 					show: {
-						resource: ['workers', 'analytics'],
+						resource: ['dnsRecord'],
 					},
 				},
+				options: [
+					{ name: 'List', value: 'list', description: 'List DNS records' },
+					{ name: 'Get', value: 'get', description: 'Get DNS record details' },
+					{ name: 'Create', value: 'create', description: 'Create a DNS record' },
+					{ name: 'Update', value: 'update', description: 'Update a DNS record' },
+					{ name: 'Delete', value: 'delete', description: 'Delete a DNS record' },
+				],
+				default: 'list',
 			},
+
+			// --------------------
+			// Cache operations
+			// --------------------
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: ['cache'],
+					},
+				},
+				options: [
+					{ name: 'Purge', value: 'purge', description: 'Purge cache' },
+				],
+				default: 'purge',
+			},
+
 			{
 				displayName: 'Zone Name or ID',
 				name: 'zoneId',
@@ -113,7 +134,7 @@ export class Cloudflare implements INodeType {
 
 				displayOptions: {
 					show: {
-						resource: ['zone', 'dnsRecord', 'firewallRule', 'cache', 'analytics'],
+						resource: ['zone', 'dnsRecord', 'firewallRule', 'cache'],
 						operation: ['get', 'update', 'delete'],
 					},
 				},
@@ -194,26 +215,6 @@ export class Cloudflare implements INodeType {
 						resource: ['dnsRecord'],
 						operation: ['create', 'update'],
 					},
-				},
-			},
-
-			// Workers deploy inputs
-			{
-				displayName: 'Route Pattern',
-				name: 'routePattern',
-				type: 'string',
-				default: '',
-				displayOptions: {
-					show: { resource: ['workers'], operation: ['deploy'] },
-				},
-			},
-			{
-				displayName: 'Script Name',
-				name: 'scriptName',
-				type: 'string',
-				default: '',
-				displayOptions: {
-					show: { resource: ['workers'], operation: ['deploy'] },
 				},
 			},
 
@@ -428,70 +429,6 @@ export class Cloudflare implements INodeType {
 						body: { purge_everything: true },
 					});
 					responseData = res;
-				}
-
-				if (resource === 'firewallRule') {
-					const zoneId = this.getNodeParameter('zoneId', i) as string;
-					if (operation === 'create') {
-						const body = items[i].json;
-						const res = await requestWithRetry(this, {
-							method: 'POST',
-							url: `/zones/${zoneId}/firewall/rules`,
-							body: Array.isArray(body) ? body : [body],
-						});
-						responseData = res.result;
-					} else if (operation === 'list') {
-						const returnAll = this.getNodeParameter('returnAll', i, false) as boolean;
-						const collect = async (limit?: number) =>
-							await collectAllPaginated(async (page, perPage) => {
-								const res = await requestWithRetry(this, {
-									method: 'GET',
-									url: `/zones/${zoneId}/firewall/rules`,
-									qs: { page, per_page: perPage },
-								});
-								return {
-									items: res.result || [],
-									total: res.result_info?.total_count,
-								};
-							}, limit);
-						responseData = returnAll
-							? await collect()
-							: await collect(this.getNodeParameter('limit', i, 100) as number);
-					} else if (operation === 'delete') {
-						const id = (this.getNodeParameter('dnsRecordId', i, '') as string) || '';
-						responseData = await requestWithRetry(this, {
-							method: 'DELETE',
-							url: `/zones/${zoneId}/firewall/rules/${id}`,
-						});
-					}
-				}
-
-				if (resource === 'workers' && operation === 'deploy') {
-					const accountId = this.getNodeParameter('accountId', i) as string;
-					const routePattern = this.getNodeParameter('routePattern', i) as string;
-					const scriptName = this.getNodeParameter('scriptName', i) as string;
-					const res = await requestWithRetry(this, {
-						method: 'PUT',
-						url: `/accounts/${accountId}/workers/filters`,
-						body: [
-							{
-								pattern: routePattern,
-								script: scriptName,
-							},
-						],
-					});
-					responseData = res;
-				}
-
-				if (resource === 'analytics' && operation === 'stats') {
-					// Example: zone analytics dashboard summary
-					const zoneId = this.getNodeParameter('zoneId', i, '') as string;
-					const res = await requestWithRetry(this, {
-						method: 'GET',
-						url: `/zones/${zoneId}/analytics/dashboard`,
-						qs: { since: '-43200' },
-					});
-					responseData = res.result;
 				}
 
 				returnData.push({
