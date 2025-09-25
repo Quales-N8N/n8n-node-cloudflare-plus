@@ -134,8 +134,25 @@ export class Cloudflare implements INodeType {
 
 				displayOptions: {
 					show: {
-						resource: ['zone', 'dnsRecord', 'firewallRule', 'cache'],
-						operation: ['get', 'update', 'delete'],
+						resource: ['zone'],
+						operation: ['get', 'create', 'update', 'delete'],
+					},
+				},
+			},
+
+			{
+				displayName: 'Zone Name or ID',
+				name: 'zoneId',
+				type: 'options',
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+				typeOptions: { loadOptionsMethod: 'getZones' },
+				default: '',
+
+				displayOptions: {
+					show: {
+						resource: ['dnsRecord', 'firewallRule', 'cache'],
+						operation: ['list', 'get', 'update', 'delete'],
 					},
 				},
 			},
