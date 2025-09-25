@@ -15,48 +15,41 @@ export async function requestWithRetry(
 	opts: RequestOptions,
 	maxRetries = 5,
 ): Promise<any> {
-	let attempt = 0;
-	let waitMs = 1000;
-	while (true) {
-		try {
-			// Build headers explicitly from credentials to avoid undefined header injection
-			const creds = await (ctx as any).getCredentials('cloudflareApi');
-			const headers: Record<string, string> = { Accept: 'application/json' };
-			if (creds?.authType === 'apiToken' && creds?.apiToken) {
-				headers['Authorization'] = `Bearer ${creds.apiToken}`;
-			} else if (creds?.authType === 'apiKey' && creds?.apiKey && creds?.email) {
-				headers['X-Auth-Key'] = String(creds.apiKey);
-				headers['X-Auth-Email'] = String(creds.email);
-			}
-			if (typeof opts.body !== 'undefined') headers['Content-Type'] = 'application/json';
-
-			const requestOptions: any = {
-				method: opts.method,
-				url: 'https://api.cloudflare.com/client/v4' + opts.url,
-				qs: opts.qs,
-				returnFullResponse: true,
-				json: true,
-				headers,
-			};
-			if (typeof opts.body !== 'undefined') requestOptions.body = opts.body;
-
-			const response = await (ctx as IExecuteFunctions).helpers.httpRequest.call(
-				ctx,
-				requestOptions,
-			);
-			const status = response.statusCode as number;
-			if (status >= 200 && status < 300) {
-				return response.body;
-			}
-			throw toCloudflareError(response.body, status);
-		} catch (err: any) {
-			// Network or thrown error
-			if (err?.response) {
-				const status = err.response.statusCode || err.response.status;
-				throw toCloudflareError(err.response.body || err.response.data, status);
-			}
-			throw err;
+	try {
+		// Build headers explicitly from credentials to avoid undefined header injection
+		const creds = await (ctx as any).getCredentials('cloudflareApi');
+		const headers: Record<string, string> = { Accept: 'application/json' };
+		if (creds?.authType === 'apiToken' && creds?.apiToken) {
+			headers['Authorization'] = `Bearer ${creds.apiToken}`;
+		} else if (creds?.authType === 'apiKey' && creds?.apiKey && creds?.email) {
+			headers['X-Auth-Key'] = String(creds.apiKey);
+			headers['X-Auth-Email'] = String(creds.email);
 		}
+		if (typeof opts.body !== 'undefined') headers['Content-Type'] = 'application/json';
+
+		const requestOptions: any = {
+			method: opts.method,
+			url: 'https://api.cloudflare.com/client/v4' + opts.url,
+			qs: opts.qs,
+			returnFullResponse: true,
+			json: true,
+			headers,
+		};
+		if (typeof opts.body !== 'undefined') requestOptions.body = opts.body;
+
+		const response = await (ctx as IExecuteFunctions).helpers.httpRequest.call(ctx, requestOptions);
+		const status = response.statusCode as number;
+		if (status >= 200 && status < 300) {
+			return response.body;
+		}
+		throw toCloudflareError(response.body, status);
+	} catch (err: any) {
+		// Network or thrown error
+		if (err?.response) {
+			const status = err.response.statusCode || err.response.status;
+			throw toCloudflareError(err.response.body || err.response.data, status);
+		}
+		throw err;
 	}
 }
 
