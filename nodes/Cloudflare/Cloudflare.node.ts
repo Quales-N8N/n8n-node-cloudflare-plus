@@ -73,7 +73,6 @@ export class Cloudflare implements INodeType {
 					{ name: 'List', value: 'list', description: 'List zones' },
 					{ name: 'Get', value: 'get', description: 'Get zone details' },
 					{ name: 'Create', value: 'create', description: 'Create a zone' },
-					{ name: 'Update', value: 'update', description: 'Update a zone' },
 					{ name: 'Delete', value: 'delete', description: 'Delete a zone' },
 				],
 				default: 'list',
