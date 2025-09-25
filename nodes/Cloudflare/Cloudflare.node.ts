@@ -114,6 +114,7 @@ export class Cloudflare implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['zone', 'dnsRecord', 'firewallRule', 'cache', 'analytics'],
+						operation: ['get', 'update', 'delete'],
 					},
 				},
 			},

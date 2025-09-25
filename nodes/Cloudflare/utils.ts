@@ -10,13 +10,6 @@ export interface RequestOptions {
 	body?: any;
 }
 
-
-export function sleep(ms: number): Promise<void> {
-	return new Promise((resolve) => {
-		setTimeout(resolve, ms);
-	});
-}
-
 export async function requestWithRetry(
 	ctx: Ctx,
 	opts: RequestOptions,
@@ -55,33 +48,11 @@ export async function requestWithRetry(
 			if (status >= 200 && status < 300) {
 				return response.body;
 			}
-			// Handle Cloudflare errors consistently
-			const retryAfterHeader = response.headers?.['retry-after'];
-			if (status === 429 || status === 503) {
-				if (attempt >= maxRetries) throw toCloudflareError(response.body, status);
-				const retryAfter = retryAfterHeader
-					? parseInt(String(retryAfterHeader), 10) * 1000
-					: waitMs;
-				await sleep(Math.max(retryAfter, waitMs));
-				attempt++;
-				waitMs *= 2;
-				continue;
-			}
 			throw toCloudflareError(response.body, status);
 		} catch (err: any) {
 			// Network or thrown error
 			if (err?.response) {
 				const status = err.response.statusCode || err.response.status;
-				if ((status === 429 || status === 503) && attempt < maxRetries) {
-					const retryAfterHeader = err.response.headers?.['retry-after'];
-					const retryAfter = retryAfterHeader
-						? parseInt(String(retryAfterHeader), 10) * 1000
-						: waitMs;
-					await sleep(Math.max(retryAfter, waitMs));
-					attempt++;
-					waitMs *= 2;
-					continue;
-				}
 				throw toCloudflareError(err.response.body || err.response.data, status);
 			}
 			throw err;
